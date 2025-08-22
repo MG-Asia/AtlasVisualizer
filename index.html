@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Atlas Visualizer</title>
+    <style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --accent: #38bdf8;
+        --background: #f8fafc;
+        --surface: #fff;
+        --border: #e0e7ef;
+        --text: #22223b;
+        --muted: #64748b;
+        --shadow: 0 4px 24px rgba(30, 64, 175, 0.08), 0 1.5px 4px rgba(30, 64, 175, 0.06);
+        --radius: 14px;
+    }
+
+    body {
+        font-family: 'Segoe UI', 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: var(--background);
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 40px auto 0 auto;
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 36px 32px 32px 32px;
+        position: relative;
+    }
+
+    h1 {
+        color: var(--primary);
+        font-size: 2.2rem;
+        margin-bottom: 8px;
+        letter-spacing: -1px;
+    }
+
+    p {
+        color: var(--muted);
+        margin-bottom: 28px;
+        font-size: 1.08rem;
+    }
+
+    .controls {
+        margin: 24px 0 18px 0;
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    input[type="file"] {
+        padding: 7px 0;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--background);
+        color: var(--text);
+        font-size: 1rem;
+        transition: border 0.2s;
+        outline: none;
+    }
+
+    input[type="file"]:focus {
+        border: 1.5px solid var(--primary);
+    }
+
+    button {
+        padding: 10px 28px;
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(37,99,235,0.07);
+        cursor: pointer;
+        transition: background 0.18s, box-shadow 0.18s;
+    }
+
+    button:hover, button:focus {
+        background: var(--primary-dark);
+        box-shadow: 0 4px 16px rgba(37,99,235,0.13);
+    }
+
+    #error {
+        color: #e11d48;
+        margin-top: 8px;
+        font-size: 1.05rem;
+        min-height: 24px;
+    }
+
+    canvas {
+        border: 1.5px solid var(--border);
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: 0 2px 12px rgba(30, 64, 175, 0.07);
+        max-width: 100%;
+        margin-top: 18px;
+        margin-bottom: 18px;
+        display: block;
+    }
+
+    #infoBox {
+        position: absolute;
+        background: #fff;
+        color: var(--text);
+        padding: 18px 22px 14px 22px;
+        border-radius: 12px;
+        font-size: 1.04rem;
+        line-height: 1.6;
+        pointer-events: none;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 8px 32px rgba(37,99,235,0.13), 0 2px 8px rgba(30, 64, 175, 0.09);
+        min-width: 220px;
+        border: 1.5px solid var(--border);
+        transition: box-shadow 0.18s;
+    }
+
+    #infoBox .info-title {
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 10px;
+        font-size: 1.08rem;
+        letter-spacing: 0.2px;
+    }
+
+    #infoBox .info-item {
+        margin: 4px 0;
+        display: flex;
+        gap: 8px;
+    }
+
+    #infoBox .info-label {
+        color: var(--primary-dark);
+        font-weight: 500;
+        min-width: 80px;
+        display: inline-block;
+    }
+
+    #infoBox .info-value {
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .stats {
+        margin-top: 28px;
+        padding: 22px 28px 18px 28px;
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: 0 2px 12px rgba(30, 64, 175, 0.07);
+        border: 1.5px solid var(--border);
+        text-align: left;
+    }
+
+    .stats h3 {
+        margin-top: 0;
+        color: var(--primary-dark);
+        font-size: 1.18rem;
+        margin-bottom: 10px;
+    }
+
+    .stats h4 {
+        color: var(--primary);
+        margin-bottom: 8px;
+        margin-top: 18px;
+        font-size: 1.08rem;
+    }
+
+    #objectList {
+        max-height: 220px;
+        overflow-y: auto;
+        text-align: left;
+        margin-top: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--background);
+        box-shadow: 0 1px 4px rgba(30, 64, 175, 0.04);
+        padding: 6px 0;
+    }
+
+    .object-item {
+        padding: 7px 16px;
+        cursor: pointer;
+        border-radius: 6px;
+        margin: 2px 0;
+        transition: background 0.16s, color 0.16s;
+        color: var(--text);
+        font-size: 1rem;
+    }
+
+    .object-item:hover {
+        background-color: var(--accent);
+        color: #fff;
+    }
+
+    .object-item.highlighted {
+        background-color: var(--primary);
+        color: #fff;
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+        background: var(--background);
+        border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 8px;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced Atlas Visualizer</h1>
+        <p>Upload a .atlas file and its corresponding .png image to visualize object bounding boxes with interactive details.</p>
+        
+        <div class="controls">
+            <input type="file" id="atlasFile" accept=".atlas,.txt" />
+            <input type="file" id="pngFile" accept=".png" />
+            <button onclick="visualize()">Visualize</button>
+            <button onclick="clearCanvas()">Clear</button>
+        </div>
+        
+        <div id="error"></div>
+        <canvas id="canvas"></canvas>
+        
+        <div id="infoBox">
+            <div class="info-title">Object Details</div>
+            <div id="infoContent"></div>
+        </div>
+        
+        <div id="stats" class="stats" style="display: none;">
+            <h3>Atlas Statistics</h3>
+            <div id="statsContent"></div>
+            <h4>Objects List (hover to highlight):</h4>
+            <div id="objectList"></div>
+        </div>
+    </div>
+
+    <script>
+        let objects = [];
+        let canvas, ctx;
+        let img = null;
+        let hoveredObject = null;
+
+        function parseAtlas(atlasText) {
+            const parsedObjects = [];
+            let currentObject = null;
+            const lines = atlasText.split('\n').map(line => line.trim());
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line) continue;
+
+                // Check for PNG file definition
+                if (line.endsWith('.png')) {
+                    continue; // Skip header lines
+                }
+                // Check for object name (no colon, not indented)
+                if (!line.includes(':') && line !== 'repeat: none' && !line.startsWith('size') && !line.startsWith('format') && !line.startsWith('filter')) {
+                    currentObject = { name: line };
+                    parsedObjects.push(currentObject);
+                } else if (currentObject && line.includes(':')) {
+                    const [key, value] = line.split(':').map(s => s.trim());
+                    if (key === 'rotate') {
+                        currentObject.rotate = value === 'true';
+                    } else if (key === 'xy') {
+                        const [x, y] = value.split(',').map(Number);
+                        currentObject.xy = { x, y };
+                    } else if (key === 'size') {
+                        const [width, height] = value.split(',').map(Number);
+                        currentObject.size = { width, height };
+                    } else if (key === 'orig') {
+                        const [origWidth, origHeight] = value.split(',').map(Number);
+                        currentObject.orig = { width: origWidth, height: origHeight };
+                    } else if (key === 'offset') {
+                        const [offsetX, offsetY] = value.split(',').map(Number);
+                        currentObject.offset = { x: offsetX, y: offsetY };
+                    } else if (key === 'index') {
+                        currentObject.index = Number(value);
+                    }
+                }
+            }
+            return parsedObjects;
+        }
+
+        function isPointInRect(px, py, rect) {
+            const { x, y, width, height, rotate } = rect;
+            
+            if (rotate) {
+                // For rotated rectangles, we need more complex collision detection
+                // For simplicity, using the bounding box approach
+                const centerX = x + width / 2;
+                const centerY = y + height / 2;
+                
+                // Transform point relative to rectangle center
+                const dx = px - centerX;
+                const dy = py - centerY;
+                
+                // Rotate point back by -90 degrees
+                const rotatedX = dy;
+                const rotatedY = -dx;
+                
+                // Check if point is within the unrotated rectangle
+                return Math.abs(rotatedX) <= width / 2 && Math.abs(rotatedY) <= height / 2;
+            } else {
+                return px >= x && px <= x + width && py >= y && py <= y + height;
+            }
+        }
+
+        function getObjectAtPoint(x, y) {
+            // Check objects in reverse order (top to bottom in rendering)
+            for (let i = objects.length - 1; i >= 0; i--) {
+                const obj = objects[i];
+                if (!obj.xy || !obj.size) continue;
+                
+                const rect = {
+                    x: obj.xy.x,
+                    y: obj.xy.y,
+                    width: obj.size.width,
+                    height: obj.size.height,
+                    rotate: obj.rotate || false
+                };
+                
+                if (isPointInRect(x, y, rect)) {
+                    return obj;
+                }
+            }
+            return null;
+        }
+
+        function showInfoBox(obj, mouseX, mouseY) {
+            const infoBox = document.getElementById('infoBox');
+            const infoContent = document.getElementById('infoContent');
+            
+            let content = '';
+            content += `<div class="info-item"><span class="info-label">Name:</span> <span class="info-value">${obj.name}</span></div>`;
+            
+            if (obj.xy) {
+                content += `<div class="info-item"><span class="info-label">Position:</span> <span class="info-value">${obj.xy.x}, ${obj.xy.y}</span></div>`;
+            }
+            
+            if (obj.size) {
+                content += `<div class="info-item"><span class="info-label">Size:</span> <span class="info-value">${obj.size.width} x ${obj.size.height}</span></div>`;
+            }
+            
+            if (obj.orig) {
+                content += `<div class="info-item"><span class="info-label">Original:</span> <span class="info-value">${obj.orig.width} x ${obj.orig.height}</span></div>`;
+            }
+            
+            if (obj.offset) {
+                content += `<div class="info-item"><span class="info-label">Offset:</span> <span class="info-value">${obj.offset.x}, ${obj.offset.y}</span></div>`;
+            }
+            
+            if (obj.rotate) {
+                content += `<div class="info-item"><span class="info-label">Rotated:</span> <span class="info-value">Yes (90°)</span></div>`;
+            }
+            
+            if (obj.index !== undefined) {
+                content += `<div class="info-item"><span class="info-label">Index:</span> <span class="info-value">${obj.index}</span></div>`;
+            }
+            
+            infoContent.innerHTML = content;
+            
+            // Position the info box
+            const container = document.querySelector('.container');
+            const containerRect = container.getBoundingClientRect();
+            
+            infoBox.style.left = (mouseX + 15) + 'px';
+            infoBox.style.top = (mouseY - 10) + 'px';
+            infoBox.style.display = 'block';
+        }
+
+        function hideInfoBox() {
+            document.getElementById('infoBox').style.display = 'none';
+        }
+
+        function drawCanvas() {
+            if (!img || !canvas) return;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw the PNG
+            ctx.drawImage(img, 0, 0);
+            
+            // Draw bounding boxes and labels
+            objects.forEach(obj => {
+                if (!obj.xy || !obj.size) return;
+                
+                const { x, y } = obj.xy;
+                let { width, height } = obj.size;
+                const isRotated = obj.rotate || false;
+                const isHovered = obj === hoveredObject;
+                
+                // Set styles based on hover state
+                ctx.strokeStyle = isHovered ? '#FF5722' : 'red';
+                ctx.lineWidth = isHovered ? 3 : 2;
+                ctx.font = isHovered ? 'bold 14px Arial' : '14px Arial';
+                ctx.fillStyle = isHovered ? '#FF5722' : 'black';
+                ctx.textBaseline = 'top';
+                
+                // Draw bounding box and label
+                if (isRotated) {
+                    [width, height] = [height, width];
+                    ctx.save();
+                    ctx.translate(x + width / 2, y + height / 2);
+                    ctx.rotate(Math.PI / 2);
+                    ctx.strokeRect(-width / 2, -height / 2, width, height);
+                    
+                    // Fill background for rotated text
+                    if (isHovered) {
+                        ctx.fillStyle = 'rgba(255, 87, 34, 0.8)';
+                        ctx.fillRect(-width / 2, -height / 2 - 25, width, 20);
+                    }
+                    
+                    ctx.fillStyle = isHovered ? 'white' : 'black';
+                    ctx.fillText(obj.name, -width / 2 + 2, -height / 2 - 20);
+                    ctx.restore();
+                } else {
+                    ctx.strokeRect(x, y, width, height);
+                    
+                    // Fill background for text
+                    if (isHovered) {
+                        ctx.fillStyle = 'rgba(255, 87, 34, 0.8)';
+                        ctx.fillRect(x, y - 25, ctx.measureText(obj.name).width + 4, 20);
+                    }
+                    
+                    ctx.fillStyle = isHovered ? 'white' : 'black';
+                    ctx.fillText(obj.name, x + 2, y - 20);
+                }
+            });
+        }
+
+        function updateStats() {
+            const statsDiv = document.getElementById('stats');
+            const statsContent = document.getElementById('statsContent');
+            const objectList = document.getElementById('objectList');
+            
+            if (objects.length === 0) {
+                statsDiv.style.display = 'none';
+                return;
+            }
+            
+            statsDiv.style.display = 'block';
+            
+            // Calculate statistics
+            const totalObjects = objects.length;
+            const rotatedObjects = objects.filter(obj => obj.rotate).length;
+            const avgSize = objects.reduce((sum, obj) => {
+                if (obj.size) {
+                    return sum + (obj.size.width * obj.size.height);
+                }
+                return sum;
+            }, 0) / objects.length;
+            
+            statsContent.innerHTML = `
+                <div><strong>Total Objects:</strong> ${totalObjects}</div>
+                <div><strong>Rotated Objects:</strong> ${rotatedObjects}</div>
+                <div><strong>Average Object Area:</strong> ${Math.round(avgSize)} pixels</div>
+                <div><strong>Atlas Dimensions:</strong> ${img ? `${img.width} x ${img.height}` : 'N/A'}</div>
+            `;
+            
+            // Create object list
+            objectList.innerHTML = '';
+            objects.forEach((obj, index) => {
+                const item = document.createElement('div');
+                item.className = 'object-item';
+                item.innerHTML = `<strong>${obj.name}</strong> - ${obj.size ? `${obj.size.width}x${obj.size.height}` : 'No size'} ${obj.rotate ? '(Rotated)' : ''}`;
+                
+                item.addEventListener('mouseenter', () => {
+                    hoveredObject = obj;
+                    item.classList.add('highlighted');
+                    drawCanvas();
+                });
+                
+                item.addEventListener('mouseleave', () => {
+                    hoveredObject = null;
+                    item.classList.remove('highlighted');
+                    drawCanvas();
+                });
+                
+                objectList.appendChild(item);
+            });
+        }
+
+        function setupCanvasEvents() {
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                
+                const objectAtPoint = getObjectAtPoint(x, y);
+                
+                if (objectAtPoint !== hoveredObject) {
+                    hoveredObject = objectAtPoint;
+                    drawCanvas();
+                }
+                
+                if (objectAtPoint) {
+                    showInfoBox(objectAtPoint, e.clientX, e.clientY);
+                    canvas.style.cursor = 'pointer';
+                } else {
+                    hideInfoBox();
+                    canvas.style.cursor = 'crosshair';
+                }
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+                hoveredObject = null;
+                hideInfoBox();
+                drawCanvas();
+                canvas.style.cursor = 'crosshair';
+            });
+        }
+
+        function visualize() {
+            const atlasFile = document.getElementById('atlasFile').files[0];
+            const pngFile = document.getElementById('pngFile').files[0];
+            const errorDiv = document.getElementById('error');
+            
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+
+            errorDiv.textContent = '';
+
+            if (!atlasFile || !pngFile) {
+                errorDiv.textContent = 'Please upload both a .atlas file and a .png file.';
+                return;
+            }
+
+            // Read atlas file
+            const atlasReader = new FileReader();
+            atlasReader.onload = function (e) {
+                const atlasText = e.target.result;
+                objects = parseAtlas(atlasText);
+
+                // Read PNG file
+                img = new Image();
+                const pngReader = new FileReader();
+                pngReader.onload = function (e) {
+                    img.src = e.target.result;
+                    img.onload = function () {
+                        // Set canvas size to match PNG
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
+                        drawCanvas();
+                        updateStats();
+                        setupCanvasEvents();
+                    };
+                    img.onerror = function () {
+                        errorDiv.textContent = 'Error loading PNG file. Ensure it\'s a valid image.';
+                    };
+                };
+                pngReader.readAsDataURL(pngFile);
+            };
+            atlasReader.onerror = function () {
+                errorDiv.textContent = 'Error loading atlas file. Ensure it\'s a valid .atlas file.';
+            };
+            atlasReader.readAsText(atlasFile);
+        }
+
+        function clearCanvas() {
+            if (canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            objects = [];
+            img = null;
+            hoveredObject = null;
+            hideInfoBox();
+            document.getElementById('stats').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
