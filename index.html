@@ -89,26 +89,25 @@
     input[type="file"]:focus { border: 1.5px solid var(--primary); box-shadow: var(--ring); }
 
     button {
-        padding: 10px 22px;
-        background: linear-gradient(180deg, rgba(37,99,235,0.9), rgba(30,64,175,0.9));
+        padding: 10px 20px;
+        background: var(--primary);
         color: #fff;
-        border: 1px solid rgba(255,255,255,0.25);
-        border-radius: 12px;
+        border: none;
+        border-radius: 10px;
         font-size: 0.98rem;
         font-weight: 600;
-        box-shadow: 0 6px 18px rgba(37,99,235,0.18);
         cursor: pointer;
-        transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
-        -webkit-backdrop-filter: blur(calc(var(--blur) / 2));
-        backdrop-filter: blur(calc(var(--blur) / 2));
+        transition: background var(--transition), transform var(--transition);
     }
 
     button:hover, button:focus {
+        background: var(--primary-dark);
         transform: translateY(-1px);
-        box-shadow: 0 10px 28px rgba(37,99,235,0.28);
-        filter: saturate(1.05);
     }
-    button:active { transform: translateY(0); box-shadow: 0 6px 18px rgba(37,99,235,0.2); }
+
+    button:active {
+        transform: translateY(0);
+    }
 
     #error {
         color: #ef4444;
