@@ -9,271 +9,115 @@
         --primary: #2563eb;
         --primary-dark: #1e40af;
         --accent: #38bdf8;
-        --background: linear-gradient(135deg, rgba(241,245,249,0.7), rgba(219,234,254,0.7));
-        --surface: rgba(255,255,255,0.55);
-        --surface-strong: rgba(255,255,255,0.7);
-        --border: rgba(224,231,239,0.7);
-        --text: #0f172a;
-        --muted: #475569;
-        --shadow: 0 8px 30px rgba(30, 64, 175, 0.12), 0 2px 8px rgba(30, 64, 175, 0.08);
-        --radius: 16px;
-        --blur: 16px;
-        --transition: 220ms cubic-bezier(0.22, 1, 0.36, 1);
-        --ring: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        --background: #f8fafc;
+        --surface: #fff;
+        --border: #e0e7ef;
+        --text: #22223b;
+        --muted: #64748b;
+        --shadow: 0 4px 24px rgba(30, 64, 175, 0.08), 0 1.5px 4px rgba(30, 64, 175, 0.06);
+        --radius: 14px;
     }
 
-    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', 'Arial', sans-serif; margin: 0; padding: 0; background: var(--background); color: var(--text); min-height: 100vh; }
+    .container { max-width: 1100px; margin: 40px auto 0 auto; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 32px 32px 32px; position: relative; }
+    h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 8px; letter-spacing: -1px; }
+    p { color: var(--muted); margin-bottom: 28px; font-size: 1.08rem; }
+    .controls { margin: 24px 0 18px 0; display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; align-items: center; }
+    input[type="file"], select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); color: var(--text); font-size: 1rem; outline: none; }
+    input[type="file"]:focus, select:focus { border: 1.5px solid var(--primary); }
+    button { padding: 10px 28px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 500; box-shadow: 0 2px 8px rgba(37,99,235,0.07); cursor: pointer; transition: background 0.18s, box-shadow 0.18s; }
+    button:hover, button:focus { background: var(--primary-dark); box-shadow: 0 4px 16px rgba(37,99,235,0.13); }
+    #error { color: #e11d48; margin-top: 8px; font-size: 1.05rem; min-height: 24px; text-align: center; }
+    canvas { border: 1.5px solid var(--border); background: var(--surface); border-radius: 0; box-shadow: 0 2px 12px rgba(30, 64, 175, 0.07); max-width: 100%; margin-top: 18px; margin-bottom: 18px; display: block; }
+    #infoBox { position: absolute; background: #fff; color: var(--text); padding: 18px 22px 14px 22px; border-radius: 12px; font-size: 1.04rem; line-height: 1.6; pointer-events: none; z-index: 1000; display: none; box-shadow: 0 8px 32px rgba(37,99,235,0.13), 0 2px 8px rgba(30, 64, 175, 0.09); min-width: 220px; border: 1.5px solid var(--border); transition: box-shadow 0.18s; }
+    #infoBox .info-title { font-weight: 600; color: var(--primary); margin-bottom: 10px; font-size: 1.08rem; letter-spacing: 0.2px; }
+    #infoBox .info-item { margin: 4px 0; display: flex; gap: 8px; }
+    #infoBox .info-label { color: var(--primary-dark); font-weight: 500; min-width: 80px; display: inline-block; }
+    #infoBox .info-value { color: var(--muted); font-weight: 400; }
+    .stats { margin-top: 28px; padding: 22px 28px 18px 28px; background: var(--surface); border-radius: var(--radius); box-shadow: 0 2px 12px rgba(30, 64, 175, 0.07); border: 1.5px solid var(--border); text-align: left; display: none; }
+    .toggle { display: inline-flex; align-items: center; gap: 10px; user-select: none; }
+    .switch { position: relative; width: 64px; height: 32px; background: var(--border); border-radius: 999px; cursor: pointer; transition: background 0.2s; }
+    .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; background: #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15); transition: transform 0.2s; }
+    .switch.on { background: var(--primary); }
+    .switch.on::after { transform: translateX(32px); }
 
-    body {
-        font-family: 'Segoe UI', 'Arial', sans-serif;
-        margin: 0;
-        padding: 0;
-        background: var(--background);
-        background-attachment: fixed;
-        color: var(--text);
-        min-height: 100vh;
-    }
-
-    .container {
-        max-width: 1200px;
-        margin: 40px auto 40px auto;
-        background: var(--surface);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 36px 32px 32px 32px;
-        position: relative;
-        border: 1px solid var(--border);
-        -webkit-backdrop-filter: blur(var(--blur));
-        backdrop-filter: blur(var(--blur));
-        transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
-    }
-    .container:hover { transform: translateY(-1px); box-shadow: 0 16px 48px rgba(30,64,175,0.16); }
-
-    h1 {
-        color: var(--primary);
-        font-size: 2.2rem;
-        margin-bottom: 8px;
-        letter-spacing: -0.5px;
-        text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-    }
-
-    p {
-        color: var(--muted);
-        margin-bottom: 24px;
-        font-size: 1.02rem;
-    }
-
-    .controls {
-        margin: 22px 0 16px 0;
-        display: flex;
-        gap: 14px;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-    }
-
-    input[type="file"] {
-        padding: 8px 12px;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: var(--surface-strong);
-        color: var(--text);
-        font-size: 0.98rem;
-        transition: border var(--transition), box-shadow var(--transition), background var(--transition), transform var(--transition);
-        outline: none;
-        -webkit-backdrop-filter: blur(var(--blur));
-        backdrop-filter: blur(var(--blur));
-    }
-
-    input[type="file"]:hover { transform: translateY(-1px); box-shadow: var(--ring); }
-    input[type="file"]:focus { border: 1.5px solid var(--primary); box-shadow: var(--ring); }
-
-    button {
-        padding: 10px 20px;
-        background: var(--primary);
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        font-size: 0.98rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background var(--transition), transform var(--transition);
-    }
-
-    button:hover, button:focus {
-        background: var(--primary-dark);
-        transform: translateY(-1px);
-    }
-
-    button:active {
-        transform: translateY(0);
-    }
-
-    #error {
-        color: #ef4444;
-        margin-top: 8px;
-        font-size: 1rem;
-        min-height: 24px;
-        text-align: center;
-        text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-    }
-
-    /* Glass notification */
-    .notify {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        max-width: 360px;
-        padding: 14px 16px;
-        border-radius: 16px;
-        background: rgba(255,255,255,0.5);
-        -webkit-backdrop-filter: blur(18px);
-        backdrop-filter: blur(18px);
-        border: 1px solid rgba(224,231,239,0.7);
-        box-shadow: 0 16px 48px rgba(30,64,175,0.18);
-        color: #0f172a;
-        z-index: 2000;
-        display: none;
-        transition: opacity var(--transition), transform var(--transition);
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-    .notify.show { display: block; opacity: 1; transform: translateY(0); }
-    .notify-title { font-weight: 800; color: #ef4444; margin-bottom: 6px; letter-spacing: -0.2px; }
-    .notify-text { font-size: 0.96rem; color: #334155; }
-    .notify-list { margin: 8px 0 0 0; padding-left: 16px; font-size: 0.92rem; color: #475569; max-height: 180px; overflow: auto; }
-
-    canvas {
-        border: 1px solid var(--border);
-        background: var(--surface);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        max-width: 100%;
-        margin-top: 18px;
-        margin-bottom: 18px;
-        display: block;
-        -webkit-backdrop-filter: blur(var(--blur));
-        backdrop-filter: blur(var(--blur));
-    }
-
-    /* Thumbnails grid */
-    .thumb-grid {
-        margin-top: 24px;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 18px;
-    }
-
-    .thumb-item {
-        perspective: 1200px;
-        min-height: 240px;
-    }
-
-    .thumb-card {
-        position: relative;
-        width: 100%;
-        height: 240px;
-        transform-style: preserve-3d;
-        transition: transform var(--transition), box-shadow var(--transition);
-        cursor: pointer;
-    }
-
-    .thumb-card.is-flipped {
-        transform: rotateY(180deg);
-    }
-
-    .thumb-face {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 10px;
-        background: var(--surface-strong);
-        box-shadow: 0 6px 18px rgba(30, 64, 175, 0.08);
-        backface-visibility: hidden;
-        overflow: hidden;
-        -webkit-backdrop-filter: blur(var(--blur));
-        backdrop-filter: blur(var(--blur));
-    }
-
-    .thumb-item:hover .thumb-face { box-shadow: 0 10px 28px rgba(30,64,175,0.14); }
-
-    .thumb-front canvas {
-        border-radius: 10px;
-        border: 1px dashed rgba(37,99,235,0.6);
-        width: 100%;
-        height: 140px;
-        object-fit: contain;
-        background: rgba(255,255,255,0.6);
-    }
-
-    .thumb-caption {
-        margin-top: 8px;
-        font-size: 0.9rem;
-        color: var(--text);
-        text-align: center;
-        word-break: break-word;
-        font-weight: 700;
-        letter-spacing: -0.2px;
-        line-height: 1.2;
-        max-height: 2.4em;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-    }
-
-    .thumb-back {
-        transform: rotateY(180deg);
-        align-items: stretch;
-        gap: 6px;
-        padding: 10px 12px;
-        overflow: auto;
-    }
-
-    .kv {
-        display: flex;
-        gap: 8px;
-        font-size: 0.85rem;
-        color: var(--muted);
-        width: 100%;
-        line-height: 1.2;
-        word-break: break-word;
-    }
-    .kv .k { color: var(--primary-dark); min-width: 78px; font-weight: 700; }
+    .thumb-grid { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+    .thumb-item { perspective: 1000px; }
+    .thumb-card { position: relative; width: 100%; height: 230px; transform-style: preserve-3d; transition: transform 0.5s ease; cursor: pointer; }
+    .thumb-card.is-flipped { transform: rotateY(180deg); }
+    .thumb-face { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; border: 1px solid var(--border); border-radius: 0; padding: 10px; background: var(--surface); box-shadow: 0 1px 6px rgba(30, 64, 175, 0.06); backface-visibility: hidden; overflow: hidden; }
+    .thumb-front canvas { width: auto; height: 150px; margin: 0 auto; display: block; border-radius: 0; border: 1px dashed var(--primary); background: #fff; }
+    .thumb-caption { margin-top: 8px; font-size: 0.9rem; color: var(--text); text-align: center; word-break: break-word; font-weight: 600; line-height: 1.2; max-height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .thumb-back { transform: rotateY(180deg); align-items: flex-start; gap: 6px; padding: 10px 12px; overflow: auto; }
+    .kv { display: flex; gap: 8px; font-size: 0.85rem; color: var(--muted); width: 100%; line-height: 1.2; word-break: break-word; }
+    .kv .k { color: var(--primary-dark); min-width: 78px; font-weight: 600; }
     .kv .v { color: var(--muted); }
 
+    /* Canvas stack for multiple images */
+    #canvasStack { display: none; margin-top: 12px; }
+    .canvas-block { margin-bottom: 24px; }
+    .canvas-title { font-weight: 600; color: var(--primary-dark); margin: 6px 0 0 0; font-size: 0.95rem; }
+
+    /* Modal styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-content { position: relative; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); border: 1px solid var(--border); max-width: min(1000px, 92vw); max-height: min(86vh, 900px); width: 92vw; overflow: hidden; display: flex; flex-direction: column; transform: perspective(1000px) rotateY(-14deg) translateY(10px) scale(0.96); transform-origin: center; opacity: 0; transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.3s ease; }
+    .modal-overlay.open .modal-content { transform: perspective(1000px) rotateY(0deg) translateY(0) scale(1); opacity: 1; }
+    .modal-close { position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 28px; color: var(--muted); cursor: pointer; line-height: 1; padding: 6px; }
+    .modal-body { display: grid; grid-template-columns: 1fr 320px; gap: 16px; padding: 20px; height: 100%; box-sizing: border-box; }
+    .modal-canvas-wrap { display: flex; align-items: center; justify-content: center; background: #fff; border: 1px dashed var(--border); border-radius: 8px; min-height: 240px; }
+    #modalCanvas { max-width: 100%; max-height: 100%; display: block; }
+    .modal-details { overflow: auto; padding: 6px; border-left: 1px solid var(--border); }
+    .modal-details .title { font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+    .modal-details .kv { margin-bottom: 6px; }
+    @media (max-width: 860px) {
+        .modal-body { grid-template-columns: 1fr; }
+        .modal-details { border-left: none; border-top: 1px solid var(--border); }
+    }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Enhanced Atlas Visualizer</h1>
-        <p>Upload a .atlas file and corresponding .png/.jpg images to visualize each region as flip cards.</p>
+        <p>Upload a .atlas file and visualize regions either on a canvas (single/multiple images) or as thumbnails (flip cards).</p>
         
         <div class="controls">
+            <div class="toggle">
+                <span>Canvas</span>
+                <div id="modeSwitch" class="switch" title="Toggle to switch visualization mode"></div>
+                <span>Thumbnails</span>
+            </div>
             <input type="file" id="atlasFile" accept=".atlas,.txt" />
-            <input type="file" id="pngFile" accept=".png,.jpg,.jpeg" multiple />
-            <button onclick="visualize()">Visualize</button>
-            <button onclick="clearCanvas()">Clear</button>
+            <input type="file" id="imagesInput" accept=".png,.jpg,.jpeg" multiple />
+            <button onclick="clearAll()">Clear</button>
         </div>
         
         <div id="error"></div>
-        <canvas id="canvas" style="display:none"></canvas>
+        <canvas id="canvas"></canvas>
+        <div id="canvasStack"></div>
         
-        <div id="infoBox" style="display:none">
+        <div id="infoBox">
             <div class="info-title">Object Details</div>
             <div id="infoContent"></div>
         </div>
         
-        <div id="thumbGrid" class="thumb-grid"></div>
+        <div id="stats" class="stats"></div>
+
+        <div id="thumbGrid" class="thumb-grid" style="display:none;"></div>
     </div>
 
-    <div id="notify" class="notify" role="alert" aria-live="polite"></div>
+    <!-- Modal for enlarged preview -->
+    <div id="modalOverlay" class="modal-overlay" style="display:none;">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+            <div class="modal-body">
+                <div class="modal-canvas-wrap">
+                    <canvas id="modalCanvas"></canvas>
+                </div>
+                <div class="modal-details" id="modalDetails"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         let objects = [];
@@ -281,101 +125,85 @@
         let img = null;
         let hoveredObject = null;
         let imageMap = new Map();
+        let mode = 'canvas';
+
+        function ensureCanvas() { if (!canvas) canvas = document.getElementById('canvas'); if (canvas && !ctx) ctx = canvas.getContext('2d'); }
 
         function parseAtlas(atlasText) {
-            const parsedObjects = [];
-            let currentObject = null;
-            let currentPage = null;
+            const parsedObjects = []; let currentObject = null; let currentPage = null;
             const lines = atlasText.split('\n').map(line => line.trim());
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                if (!line) continue;
-
-                if (line.match(/\.(png|jpg|jpeg)$/i)) {
-                    currentPage = line.split(/[\\\/]/).pop();
-                    continue;
-                }
-                if (!line.includes(':') && line !== 'repeat: none' && !line.startsWith('size') && !line.startsWith('format') && !line.startsWith('filter')) {
-                    currentObject = { name: line, page: currentPage };
-                    parsedObjects.push(currentObject);
-                } else if (currentObject && line.includes(':')) {
-                    const [k, v] = line.split(':');
-                    const key = k.trim();
-                    const value = v.trim();
-                    if (key === 'rotate') {
-                        currentObject.rotate = value === 'true';
-                    } else if (key === 'xy') {
-                        const [x, y] = value.split(',').map(Number);
-                        currentObject.xy = { x, y };
-                    } else if (key === 'size') {
-                        const [width, height] = value.split(',').map(Number);
-                        currentObject.size = { width, height };
-                    } else if (key === 'orig') {
-                        const [origWidth, origHeight] = value.split(',').map(Number);
-                        currentObject.orig = { width: origWidth, height: origHeight };
-                    } else if (key === 'offset') {
-                        const [offsetX, offsetY] = value.split(',').map(Number);
-                        currentObject.offset = { x: offsetX, y: offsetY };
-                    } else if (key === 'index') {
-                        currentObject.index = Number(value);
-                    }
-                }
+            for (let i = 0; i < lines.length; i++) { const line = lines[i]; if (!line) continue;
+                if (line.match(/\.(png|jpg|jpeg)$/i)) { currentPage = line.split(/[\\/]/).pop(); continue; }
+                if (!line.includes(':') && line !== 'repeat: none' && !line.startsWith('size') && !line.startsWith('format') && !line.startsWith('filter')) { currentObject = { name: line, page: currentPage }; parsedObjects.push(currentObject); }
+                else if (currentObject && line.includes(':')) { const [k, v] = line.split(':'); const key = k.trim(); const value = v.trim();
+                    if (key === 'rotate') currentObject.rotate = value === 'true';
+                    else if (key === 'xy') { const [x, y] = value.split(',').map(Number); currentObject.xy = { x, y }; }
+                    else if (key === 'size') { const [w, h] = value.split(',').map(Number); currentObject.size = { width: w, height: h }; }
+                    else if (key === 'orig') { const [ow, oh] = value.split(',').map(Number); currentObject.orig = { width: ow, height: oh }; }
+                    else if (key === 'offset') { const [ox, oy] = value.split(',').map(Number); currentObject.offset = { x: ox, y: oy }; }
+                    else if (key === 'index') currentObject.index = Number(value); }
             }
             return parsedObjects;
         }
 
-        function renderThumbnails() {
-            const grid = document.getElementById('thumbGrid');
-            grid.innerHTML = '';
-            if (!objects.length) return;
+        function isPointInRect(px, py, rect) { const { x, y, width, height, rotate } = rect;
+            if (rotate) { const centerX = x + width / 2; const centerY = y + height / 2; const dx = px - centerX; const dy = py - centerY; const rotatedX = dy; const rotatedY = -dx; return Math.abs(rotatedX) <= width / 2 && Math.abs(rotatedY) <= height / 2; }
+            else { return px >= x && px <= x + width && py >= y && py <= y + height; } }
+        function getObjectAtPointFromList(list, x, y) { for (let i = list.length - 1; i >= 0; i--) { const obj = list[i]; if (!obj.xy || !obj.size) continue; const rect = { x: obj.xy.x, y: obj.xy.y, width: obj.size.width, height: obj.size.height, rotate: obj.rotate || false }; if (isPointInRect(x, y, rect)) return obj; } return null; }
 
+        function showInfoBox(obj, mouseX, mouseY) { const infoBox = document.getElementById('infoBox'); const infoContent = document.getElementById('infoContent'); let content = '';
+            content += `<div class="info-item"><span class="info-label">Name:</span> <span class="info-value">${obj.name}</span></div>`;
+            if (obj.page) content += `<div class=\"info-item\"><span class=\"info-label\">Image:</span> <span class=\"info-value\">${obj.page}</span></div>`;
+            if (obj.xy) content += `<div class="info-item"><span class="info-label">Position:</span> <span class="info-value">${obj.xy.x}, ${obj.xy.y}</span></div>`;
+            if (obj.size) content += `<div class="info-item"><span class="info-label">Size:</span> <span class="info-value">${obj.size.width} x ${obj.size.height}</span></div>`;
+            if (obj.orig) content += `<div class="info-item"><span class="info-label">Original:</span> <span class="info-value">${obj.orig.width} x ${obj.orig.height}</span></div>`;
+            if (obj.offset) content += `<div class="info-item"><span class="info-label">Offset:</span> <span class="info-value">${obj.offset.x}, ${obj.offset.y}</span></div>`;
+            if (obj.rotate) content += `<div class="info-item"><span class="info-label">Rotated:</span> <span class="info-value">Yes (90°)</span></div>`;
+            if (obj.index !== undefined) content += `<div class="info-item"><span class="info-label">Index:</span> <span class="info-value">${obj.index}</span></div>`;
+            infoContent.innerHTML = content; infoBox.style.left = (mouseX + 15) + 'px'; infoBox.style.top = (mouseY - 10) + 'px'; infoBox.style.display = 'block'; }
+        function hideInfoBox() { document.getElementById('infoBox').style.display = 'none'; }
+
+        function renderCanvasStack() {
+            ensureCanvas(); const stack = document.getElementById('canvasStack'); const grid = document.getElementById('thumbGrid'); if (!stack) return;
+            stack.innerHTML = ''; if (grid) grid.style.display = 'none'; document.getElementById('canvas').style.display = 'none'; stack.style.display = 'block';
+            const entries = Array.from(imageMap.entries());
+            entries.forEach(([pageKey, image]) => {
+                const filtered = objects.filter(o => (o.page || '').split(/[\\/]/).pop() === pageKey);
+                const block = document.createElement('div'); block.className = 'canvas-block';
+                const c = document.createElement('canvas'); const cctx = c.getContext('2d'); c.width = image.width; c.height = image.height;
+                cctx.clearRect(0, 0, c.width, c.height); cctx.drawImage(image, 0, 0);
+                filtered.forEach(obj => { if (!obj.xy || !obj.size) return; const { x, y } = obj.xy; let { width, height } = obj.size;
+                    if (obj.rotate) { [width, height] = [height, width]; cctx.save(); cctx.translate(x + width / 2, y + height / 2); cctx.rotate(Math.PI / 2); cctx.strokeStyle = 'red'; cctx.lineWidth = 2; cctx.strokeRect(-width / 2, -height / 2, width, height); cctx.font = '14px Arial'; cctx.fillStyle = 'black'; cctx.fillText(obj.name, -width / 2 + 2, -height / 2 - 20); cctx.restore(); }
+                    else { cctx.strokeStyle = 'red'; cctx.lineWidth = 2; cctx.strokeRect(x, y, width, height); cctx.font = '14px Arial'; cctx.fillStyle = 'black'; cctx.fillText(obj.name, x + 2, y - 20); }
+                });
+                // Removed hover tooltip behavior
+                // c.addEventListener('mousemove', ...)
+                // c.addEventListener('mouseleave', ...)
+                c.addEventListener('click', (e) => { const rect = c.getBoundingClientRect(); const scaleX = c.width / rect.width; const scaleY = c.height / rect.height; const px = (e.clientX - rect.left) * scaleX; const py = (e.clientY - rect.top) * scaleY; const hit = getObjectAtPointFromList(filtered, px, py); if (hit) { openModalWithRegion(hit, image); } });
+                block.appendChild(c); const title = document.createElement('div'); title.className = 'canvas-title'; title.textContent = pageKey; block.appendChild(title); stack.appendChild(block);
+            });
+        }
+
+        function renderThumbnails() {
+            const grid = document.getElementById('thumbGrid'); ensureCanvas(); if (!grid) return;
+            grid.innerHTML = ''; if (!objects.length) return;
+            const referencedPages = Array.from(new Set(objects.map(o => (o.page || '').split(/[\\/]/).pop()).filter(Boolean)));
+            const uploaded = new Set(Array.from(imageMap.keys())); const missing = referencedPages.filter(p => !uploaded.has(p));
+            const errorDiv = document.getElementById('error'); errorDiv.textContent = missing.length ? ('Missing images: ' + missing.join(', ')) : '';
+            document.getElementById('canvas').style.display = 'none'; document.getElementById('canvasStack').style.display = 'none'; grid.style.display = 'grid';
             objects.forEach(obj => {
                 if (!obj.xy || !obj.size || !obj.page) return;
-                const sourceImg = imageMap.get((obj.page || '').split(/[\\\/]/).pop());
-                if (!sourceImg) return;
-
-                const { x, y } = obj.xy;
-                const { width, height } = obj.size;
-
-                const thumbCanvas = document.createElement('canvas');
-                const thumbCtx = thumbCanvas.getContext('2d');
-                thumbCanvas.width = width;
-                thumbCanvas.height = height;
-
-                if (obj.rotate) {
-                    thumbCanvas.width = width;
-                    thumbCanvas.height = height;
-                    thumbCtx.save();
-                    thumbCtx.translate(width / 2, height / 2);
-                    thumbCtx.rotate(-Math.PI / 2);
-                    thumbCtx.drawImage(
-                        sourceImg,
-                        x, y, height, width,
-                        -height / 2, -width / 2, height, width
-                    );
-                    thumbCtx.restore();
-                } else {
-                    thumbCtx.drawImage(sourceImg, x, y, width, height, 0, 0, width, height);
-                }
-
-                const item = document.createElement('div');
-                item.className = 'thumb-item';
-                const card = document.createElement('div');
-                card.className = 'thumb-card';
-
-                const front = document.createElement('div');
-                front.className = 'thumb-face thumb-front';
-                front.appendChild(thumbCanvas);
-                const caption = document.createElement('div');
-                caption.className = 'thumb-caption';
-                caption.textContent = obj.name;
-                front.appendChild(caption);
-
-                const back = document.createElement('div');
-                back.className = 'thumb-face thumb-back';
-                back.innerHTML = `
-                    <div class="thumb-caption" style="font-size:0.85rem;font-weight:700;">${obj.page}</div>
+                const sourceImg = imageMap.get((obj.page || '').split(/[\\/]/).pop()); if (!sourceImg) return;
+                const { x, y } = obj.xy; const { width, height } = obj.size;
+                const c = document.createElement('canvas'); const cx = c.getContext('2d'); c.width = width; c.height = height;
+                if (obj.rotate) { cx.save(); cx.translate(width/2, height/2); cx.rotate(-Math.PI/2); cx.drawImage(sourceImg, x, y, height, width, -height/2, -width/2, height, width); cx.restore(); }
+                else { cx.drawImage(sourceImg, x, y, width, height, 0, 0, width, height); }
+                const item = document.createElement('div'); item.className = 'thumb-item';
+                const card = document.createElement('div'); card.className = 'thumb-card';
+                const front = document.createElement('div'); front.className = 'thumb-face thumb-front'; front.appendChild(c);
+                const caption = document.createElement('div'); caption.className = 'thumb-caption'; caption.textContent = obj.name; front.appendChild(caption);
+                const back = document.createElement('div'); back.className = 'thumb-face thumb-back'; back.innerHTML = `
+                    <div class="thumb-caption" style="font-size:0.85rem;font-weight:600;">${obj.page}</div>
                     ${obj.xy ? `<div class=\"kv\"><div class=\"k\">Position</div><div class=\"v\">${obj.xy.x}, ${obj.xy.y}</div></div>` : ''}
                     ${obj.size ? `<div class=\"kv\"><div class=\"k\">Size</div><div class=\"v\">${obj.size.width} x ${obj.size.height}</div></div>` : ''}
                     ${obj.orig ? `<div class=\"kv\"><div class=\"k\">Original</div><div class=\"v\">${obj.orig.width} x ${obj.orig.height}</div></div>` : ''}
@@ -383,136 +211,118 @@
                     ${obj.rotate ? `<div class=\"kv\"><div class=\"k\">Rotated</div><div class=\"v\">Yes (90°)</div></div>` : ''}
                     ${obj.index !== undefined ? `<div class=\"kv\"><div class=\"k\">Index</div><div class=\"v\">${obj.index}</div></div>` : ''}
                 `;
-
-                card.appendChild(front);
-                card.appendChild(back);
-                item.appendChild(card);
-
-                item.addEventListener('click', () => {
-                    card.classList.toggle('is-flipped');
-                });
-
+                card.appendChild(front); card.appendChild(back); item.appendChild(card);
+                item.addEventListener('click', () => { card.classList.toggle('is-flipped'); });
                 grid.appendChild(item);
             });
         }
 
         async function loadSelectedImagesAsMap(fileList) {
-            imageMap.clear();
-            const files = Array.from(fileList || []);
-            const allowed = new Set(['png','jpg','jpeg']);
-            const bad = files.filter(f => !allowed.has((f.name.split('.').pop() || '').toLowerCase()));
-            if (bad.length) {
-                throw new Error('Only .png/.jpg images are supported.');
-            }
-            const readAsDataURL = (file) => new Promise((resolve, reject) => {
-                const fr = new FileReader();
-                fr.onload = () => resolve({ name: file.name, url: fr.result });
-                fr.onerror = reject;
-                fr.readAsDataURL(file);
-            });
+            imageMap.clear(); const files = Array.from(fileList || []);
+            const allowed = new Set(['png','jpg','jpeg']); const bad = files.filter(f => !allowed.has((f.name.split('.').pop() || '').toLowerCase())); if (bad.length) throw new Error('Only .png/.jpg images are supported.');
+            const readAsDataURL = (file) => new Promise((resolve, reject) => { const fr = new FileReader(); fr.onload = () => resolve({ name: file.name, url: fr.result }); fr.onerror = reject; fr.readAsDataURL(file); });
             const entries = await Promise.all(files.map(readAsDataURL));
-            const loadImage = (name, url) => new Promise((resolve, reject) => {
-                const image = new Image();
-                image.onload = () => resolve({ name, image });
-                image.onerror = reject;
-                image.src = url;
-            });
-            const results = await Promise.all(entries.map(e => loadImage(e.name, e.url)));
-            results.forEach(({ name, image }) => {
-                const key = name.split(/[\\\/]/).pop();
-                imageMap.set(key, image);
-            });
+            const loadImage = (name, url) => new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve({ name, image }); image.onerror = reject; image.src = url; });
+            const results = await Promise.all(entries.map(e => loadImage(e.name, e.url))); results.forEach(({ name, image }) => { const key = name.split(/[\\/]/).pop(); imageMap.set(key, image); });
         }
 
-        function showNotificationMissing(missingList) {
-            const notify = document.getElementById('notify');
-            if (!missingList || !missingList.length) {
-                notify.classList.remove('show');
-                notify.innerHTML = '';
-                return;
-            }
-            const listItems = missingList.map(fn => `<li>${fn}</li>`).join('');
-            notify.innerHTML = `
-                <div class="notify-title">Missing images</div>
-                <div class="notify-text">The atlas references image page(s) that were not uploaded:</div>
-                <ul class="notify-list">${listItems}</ul>
-            `;
-            notify.classList.add('show');
-        }
-
-        function visualize() {
-            const atlasInput = document.getElementById('atlasFile');
-            const imagesInput = document.getElementById('pngFile');
-            const atlasFile = atlasInput.files[0];
-            const pngFiles = imagesInput.files;
-            const errorDiv = document.getElementById('error');
-            
-            canvas = document.getElementById('canvas');
-            ctx = canvas.getContext('2d');
-
-            errorDiv.textContent = '';
-
-            if (!atlasFile) {
-                errorDiv.textContent = 'Please select an .atlas file first.';
-                return;
-            }
-            const atlasExt = (atlasFile.name.split('.').pop() || '').toLowerCase();
-            if (!['atlas','txt'].includes(atlasExt)) {
-                errorDiv.textContent = 'Invalid atlas file. Accepted: .atlas or .txt';
-                return;
-            }
-            if (!pngFiles || pngFiles.length === 0) {
-                errorDiv.textContent = 'Please select one or more .png/.jpg images.';
-                return;
-            }
-
-            const atlasReader = new FileReader();
-            atlasReader.onload = async function (e) {
-                try {
-                    const atlasText = e.target.result;
-                    objects = parseAtlas(atlasText);
-                    await loadSelectedImagesAsMap(pngFiles);
-
-                    const referencedPages = Array.from(new Set(objects.map(o => (o.page || '').split(/[\\\/]/).pop()).filter(Boolean)));
-                    const uploadedPages = new Set(Array.from(imageMap.keys()));
-                    const missing = referencedPages.filter(p => !uploadedPages.has(p));
-                    showNotificationMissing(missing);
-
-                    const firstImg = imageMap.values().next().value || null;
-                    img = firstImg || null;
-                    if (img) {
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                    }
-
-                    renderThumbnails();
-                } catch (err) {
-                    console.error(err);
-                    errorDiv.textContent = err && err.message ? err.message : 'Error processing files. Ensure atlas format and images are valid.';
-                }
-            };
-            atlasReader.onerror = function () {
-                errorDiv.textContent = 'Error loading atlas file. Ensure it\'s a valid .atlas file.';
-            };
+        function autoVisualizeIfReady() {
+            ensureCanvas(); const atlasFile = document.getElementById('atlasFile').files[0]; const images = document.getElementById('imagesInput').files; const errorDiv = document.getElementById('error'); errorDiv.textContent = '';
+            if (!atlasFile) return; const atlasReader = new FileReader();
+            atlasReader.onload = async function (e) { try {
+                const atlasText = e.target.result; objects = parseAtlas(atlasText);
+                if (!images || images.length === 0) return; await loadSelectedImagesAsMap(images);
+                if (mode === 'canvas') { renderCanvasStack(); } else { renderThumbnails(); }
+            } catch (err) { console.error(err); errorDiv.textContent = 'Error processing files.'; } };
+            atlasReader.onerror = function () { document.getElementById('error').textContent = 'Error loading atlas file.'; };
             atlasReader.readAsText(atlasFile);
         }
 
-        function clearCanvas() {
-            if (canvas) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-            objects = [];
-            img = null;
-            imageMap.clear();
-            hoveredObject = null;
-            const grid = document.getElementById('thumbGrid');
-            grid.innerHTML = '';
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = '';
-            const notify = document.getElementById('notify');
-            notify.classList.remove('show');
-            notify.innerHTML = '';
+        function clearAll() {
+            ensureCanvas(); const errorDiv = document.getElementById('error'); errorDiv.textContent = '';
+            if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const grid = document.getElementById('thumbGrid'); if (grid) { grid.innerHTML = ''; grid.style.display = 'none'; }
+            const stack = document.getElementById('canvasStack'); if (stack) { stack.innerHTML = ''; stack.style.display = 'none'; }
+            if (canvas) canvas.style.display = 'block'; objects = []; hoveredObject = null; img = null; imageMap.clear(); hideInfoBox();
         }
+
+        // ==== Modal helpers ====
+        function buildDetailsHTML(obj) {
+            let html = '';
+            html += `<div class="title">${obj.name}</div>`;
+            if (obj.page) html += `<div class=\"kv\"><div class=\"k\">Image</div><div class=\"v\">${obj.page}</div></div>`;
+            if (obj.xy) html += `<div class=\"kv\"><div class=\"k\">Position</div><div class=\"v\">${obj.xy.x}, ${obj.xy.y}</div></div>`;
+            if (obj.size) html += `<div class=\"kv\"><div class=\"k\">Size</div><div class=\"v\">${obj.size.width} x ${obj.size.height}</div></div>`;
+            if (obj.orig) html += `<div class=\"kv\"><div class=\"k\">Original</div><div class=\"v\">${obj.orig.width} x ${obj.orig.height}</div></div>`;
+            if (obj.offset) html += `<div class=\"kv\"><div class=\"k\">Offset</div><div class=\"v\">${obj.offset.x}, ${obj.offset.y}</div></div>`;
+            if (obj.rotate) html += `<div class=\"kv\"><div class=\"k\">Rotated</div><div class=\"v\">Yes (90°)</div></div>`;
+            if (obj.index !== undefined) html += `<div class=\"kv\"><div class=\"k\">Index</div><div class=\"v\">${obj.index}</div></div>`;
+            return html;
+        }
+
+        function extractRegionUpright(obj, sourceImg) {
+            const srcX = obj.xy.x; const srcY = obj.xy.y;
+            const srcW = obj.size.width; const srcH = obj.size.height;
+            const targetW = obj.rotate ? srcH : srcW;
+            const targetH = obj.rotate ? srcW : srcH;
+            const off = document.createElement('canvas'); off.width = targetW; off.height = targetH; const octx = off.getContext('2d');
+            if (obj.rotate) {
+                octx.save();
+                octx.translate(targetW / 2, targetH / 2);
+                octx.rotate(-Math.PI / 2);
+                // draw rotated region centered
+                octx.drawImage(sourceImg, srcX, srcY, srcH, srcW, -srcH / 2, -srcW / 2, srcH, srcW);
+                octx.restore();
+            } else {
+                octx.drawImage(sourceImg, srcX, srcY, srcW, srcH, 0, 0, targetW, targetH);
+            }
+            return off;
+        }
+
+        function openModalWithRegion(obj, sourceImg) {
+            const overlay = document.getElementById('modalOverlay');
+            const modalCanvas = document.getElementById('modalCanvas');
+            const details = document.getElementById('modalDetails');
+            const extracted = extractRegionUpright(obj, sourceImg);
+            const regionW = extracted.width; const regionH = extracted.height;
+            const maxW = Math.min(window.innerWidth - 220, 1000);
+            const maxH = Math.min(window.innerHeight - 240, 860);
+            const scale = Math.min(maxW / regionW, maxH / regionH, 4);
+            modalCanvas.width = Math.max(1, Math.round(regionW * scale));
+            modalCanvas.height = Math.max(1, Math.round(regionH * scale));
+            const mctx = modalCanvas.getContext('2d');
+            mctx.clearRect(0, 0, modalCanvas.width, modalCanvas.height);
+            mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = 'high';
+            mctx.drawImage(extracted, 0, 0, modalCanvas.width, modalCanvas.height);
+            details.innerHTML = buildDetailsHTML(obj);
+            overlay.style.display = 'flex';
+            // force reflow then add open class for animation
+            void overlay.offsetHeight; overlay.classList.add('open');
+            const closeBtn = document.getElementById('modalClose'); if (closeBtn) closeBtn.focus();
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modalOverlay');
+            const modalCanvas = document.getElementById('modalCanvas');
+            if (!overlay) return;
+            overlay.classList.remove('open');
+            const handle = () => { overlay.style.display = 'none'; overlay.removeEventListener('transitionend', handle); };
+            overlay.addEventListener('transitionend', handle);
+            if (modalCanvas) { const mctx = modalCanvas.getContext('2d'); mctx && mctx.clearRect(0, 0, modalCanvas.width, modalCanvas.height); }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            ensureCanvas(); const switchEl = document.getElementById('modeSwitch');
+            switchEl.addEventListener('click', () => { switchEl.classList.toggle('on'); mode = switchEl.classList.contains('on') ? 'thumbnails' : 'canvas'; autoVisualizeIfReady(); });
+            document.getElementById('atlasFile').addEventListener('change', autoVisualizeIfReady);
+            document.getElementById('imagesInput').addEventListener('change', autoVisualizeIfReady);
+            // Modal close interactions
+            const overlay = document.getElementById('modalOverlay');
+            const closeBtn = document.getElementById('modalClose');
+            if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+            if (closeBtn) closeBtn.addEventListener('click', () => closeModal());
+            window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        });
     </script>
 </body>
 </html>
