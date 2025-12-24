@@ -20,6 +20,7 @@
             <input type="file" id="atlasFile" accept=".atlas,.txt" />
             <input type="file" id="imagesInput" accept=".png,.jpg,.jpeg" multiple />
             <button onclick="clearAll()">Clear</button>
+            <button id="downloadBtn" onclick="downloadAllPNGs()" style="display:none;">Download All PNGs</button>
         </div>
         
         <div id="error"></div>
@@ -51,6 +52,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

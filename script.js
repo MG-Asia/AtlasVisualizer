@@ -5,6 +5,7 @@ let hoveredObject = null;
 let imageMap = new Map();
 let mode = 'canvas';
 let currentModalObject = null;
+let atlasContent = '';
 
 function ensureCanvas() { 
     if (!canvas) canvas = document.getElementById('canvas'); 
@@ -12,6 +13,7 @@ function ensureCanvas() {
 }
 
 function parseAtlas(atlasText) {
+    atlasContent = atlasText;
     const parsedObjects = []; 
     let currentObject = null; 
     let currentPage = null;
@@ -319,6 +321,8 @@ function autoVisualizeIfReady() {
             } else { 
                 renderThumbnails(); 
             }
+            
+            document.getElementById('downloadBtn').style.display = objects.length > 0 ? 'inline-block' : 'none';
         } catch (err) { 
             console.error(err); 
             errorDiv.textContent = 'Error processing files.'; 
@@ -357,6 +361,7 @@ function clearAll() {
     img = null; 
     imageMap.clear(); 
     hideInfoBox();
+    document.getElementById('downloadBtn').style.display = 'none';
 }
 
 // ==== Modal helpers ====
@@ -494,3 +499,48 @@ window.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') closeModal(); 
     });
 });
+
+async function downloadAllPNGs() {
+    if (!objects.length || !atlasContent) {
+        alert('Please load an atlas file first');
+        return;
+    }
+
+    const zip = new JSZip();
+    const spriteGroups = {};
+
+    objects.forEach(obj => {
+        if (obj.name.includes('/')) {
+            const groupName = obj.name.split('/')[0];
+            if (!spriteGroups[groupName]) spriteGroups[groupName] = [];
+            spriteGroups[groupName].push(obj);
+        }
+    });
+
+    for (const [groupName, sprites] of Object.entries(spriteGroups)) {
+        const folder = zip.folder(groupName);
+        
+        for (const sprite of sprites) {
+            const sourceImg = imageMap.get((sprite.page || '').split(/[\\\/]/).pop());
+            if (sourceImg) {
+                const extracted = extractRegionUpright(sprite, sourceImg);
+                const blob = await new Promise(resolve => extracted.toBlob(resolve, 'image/png'));
+                const fileName = `${sprite.name.split('/').pop()}.png`;
+                folder.file(fileName, blob);
+            }
+        }
+    }
+
+    const content = await zip.generateAsync({type: 'blob', compression: 'STORE'});
+    const url = URL.createObjectURL(content);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'atlas_sprites.zip';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
